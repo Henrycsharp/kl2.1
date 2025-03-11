@@ -5,9 +5,10 @@ cd C:\users\%USERNAME%\kl2.1
 python --version > nul 2>&1
 if %errorlevel% equ 0 (
     echo Python is installed.
-    pause
 ) else (
     echo Python is not installed.
+    pause
+    exit
 )
 
 pip install requests
