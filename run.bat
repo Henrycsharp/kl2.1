@@ -2,6 +2,14 @@
 
 cd C:\users\%USERNAME%\kl2.1
 
+python --version > nul 2>&1
+if %errorlevel% equ 0 (
+    echo Python is installed.
+    pause
+) else (
+    echo Python is not installed.
+)
+
 pip install requests
 pip install pynput
 pip install pyperclip
