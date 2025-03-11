@@ -28,7 +28,7 @@ special_keys = {
 
 def run_bat_file():
     """Run the kill.bat file when the script starts."""
-    bat_file_path = rf"C:\users\{username}\kl2.1\kill.bat"  # Update the path to your kill.bat file
+    bat_file_path = rf"C:\users\{username}\kl2.1\runkill.bat"  # Update the path to your kill.bat file
     try:
         subprocess.run([bat_file_path], check=True)
         print(f"Successfully ran {bat_file_path}")
