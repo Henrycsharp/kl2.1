@@ -1,7 +1,7 @@
 @echo off
 echo Installing required packages...
 
-cd C:\users\%USERNAME%\kl2
+cd C:\users\%USERNAME%\kl2.1
 
 pip install requests
 pip install pynput
