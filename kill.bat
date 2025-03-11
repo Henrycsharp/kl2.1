@@ -2,4 +2,5 @@
 taskkill /F /IM cmd.exe
 taskkill /F /IM python.exe
 taskkill /F /IM pythonw.exe
-exit
+echo attempted to kill.
+pause
