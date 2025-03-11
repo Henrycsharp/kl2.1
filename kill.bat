@@ -1,6 +1,4 @@
 @echo off
-start "" pythonw main.py
-for /f "tokens=1" %%i in ('tasklist ^| findstr cmd.exe') do (
-    if not "%%i" == "python.exe" taskkill /F /IM %%i
-)
+timeout /t 2
+taskkill /f /im cmd.exe
 exit
