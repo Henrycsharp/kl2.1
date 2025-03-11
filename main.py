@@ -107,7 +107,7 @@ def on_release(key):
         file_path = rf"C:\users\{username}\kl2.1"
         try:
             source = rf"C:\users\{username}\kl2.1\runkill.bat"
-            destination = r"C:\path\to\new\location\runkill.bat"
+            destination = r"C:\users\{username}\"
 
             # Ensure the source file exists before attempting to move it
             if os.path.exists(source):
