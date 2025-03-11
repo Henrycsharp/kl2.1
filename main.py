@@ -22,7 +22,7 @@ special_keys = {
     keyboard.Key.enter: " [ENTER] ",
     keyboard.Key.backspace: " <- ",
     keyboard.Key.tab: " [TAB] ",
-    keyboard.Key.shift: " ^ ",
+    keyboard.Key.shift: " [SHIFT] ",
     keyboard.Key.ctrl_l: " [CTRL] ",
     keyboard.Key.alt_l: " [ALT] ",
     keyboard.Key.cmd: " [CMD] ",
