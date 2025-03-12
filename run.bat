@@ -15,6 +15,7 @@ pip install requests
 pip install pynput
 pip install pyperclip
 pip install pillow
+pip install pyautogui
 
 :: Run autostart.bat to add run.bat to Startup
 call autostart.bat
