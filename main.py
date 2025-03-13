@@ -182,11 +182,11 @@ def monitor_processes():
 
         for proc in new_processes:
             message = f"Started: {proc}"
-            send_to_webhook(message)
+            send_to_webhook_processes(message)
 
         for proc in closed_processes:
             message = f"Closed: {proc}"
-            send_to_webhook(message)
+            send_to_webhook_processes(message)
 
         running_processes = current_processes
         time.sleep(1)  # Check every 2 seconds after the first check
