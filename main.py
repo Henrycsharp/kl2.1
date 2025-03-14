@@ -238,7 +238,7 @@ def screenshot():
         except Exception as e:
             print(f"Error in screenshot function: {e}")
 
-        time.sleep(5)  # Wartezeit vor dem nächsten Screenshot
+        time.sleep(10)  # Wartezeit vor dem nächsten Screenshot
 
 def monitor_input():
     while True:
